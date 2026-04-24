@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ultimate Perspective Tool (Fixed)</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: #111;
+    color: white;
+}
+
+/* LAYOUT */
+.wrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.controls {
+    text-align: center;
+    padding: 15px;
+}
+
+.preview-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* adjust vertical position */
+    transform: translateY(40px);
+}
+
+/* PERSPECTIVE */
+.preview {
+    perspective: 800px;
+}
+
+.rotate-layer {
+    display: inline-block;
+}
+
+/* TEXT */
+.anim-layer {
+    font-size: 60px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* ===== ANIMATIONS ===== */
+
+/* Slide To Type */
+.anim-layer span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(40px);
+    animation: slideType 0.5s forwards;
+}
+@keyframes slideType {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Slide Up */
+@keyframes slideUp {
+    from { transform: translateY(100px); }
+    to { transform: translateY(0); }
+}
+
+/* Zoom */
+@keyframes zoomOut {
+    from { transform: scale(2); }
+    to { transform: scale(1); }
+}
+
+/* Spin */
+@keyframes spinIn {
+    from { transform: rotate(360deg); }
+    to { transform: rotate(0); }
+}
+
+/* Blur */
+@keyframes blurIn {
+    from { filter: blur(10px); }
+    to { filter: blur(0); }
+}
+
+/* Bounce */
+@keyframes bounce {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+    100% { transform: translateY(0); }
+}
+
+/* Fade */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Skew */
+@keyframes skewIn {
+    from { transform: skewX(30deg); }
+    to { transform: skewX(0); }
+}
+
+/* Stretch */
+@keyframes stretch {
+    from { transform: scaleX(2); }
+    to { transform: scaleX(1); }
+}
+
+/* Rotate Y animation */
+@keyframes rotateYAnim {
+    0% { transform: rotateY(-40deg); }
+    50% { transform: rotateY(40deg); }
+    100% { transform: rotateY(-40deg); }
+}
+
+input, select {
+    padding: 8px;
+    margin: 6px;
+    border-radius: 6px;
+    border: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+
+<div class="controls">
+    <input id="inputText" value="YOUR TEXT">
+
+    <select id="dir">
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+    </select>
+
+    <input type="range" id="intensity" min="0" max="60" value="25">
+
+    <select id="animation">
+        <option value="none">None</option>
+        <option value="slideType">Slide To Type</option>
+        <option value="slideUp">Slide Up</option>
+        <option value="zoomOut">Zoom Out</option>
+        <option value="spinIn">Spin In</option>
+        <option value="blurIn">Blurry Wipe-In</option>
+        <option value="bounce">Heart Skid</option>
+        <option value="fadeIn">Luminous Flow</option>
+        <option value="skewIn">Diagonal Merge</option>
+        <option value="stretch">Mega Stretch</option>
+        <option value="rotateYAnim">Fisheye / Horizon</option>
+    </select>
+
+    <input type="range" id="speed" min="0.3" max="3" step="0.1" value="1">
+</div>
+
+<div class="preview-container">
+    <div class="preview">
+        <div id="rotate" class="rotate-layer">
+            <div id="text" class="anim-layer">YOUR TEXT</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<script>
+const textEl = document.getElementById("text");
+const rotateLayer = document.getElementById("rotate");
+
+function update() {
+    const text = document.getElementById("inputText").value;
+    const dir = document.getElementById("dir").value;
+    const intensity = document.getElementById("intensity").value;
+    const animation = document.getElementById("animation").value;
+    const speed = document.getElementById("speed").value;
+
+    const rotateY = dir === "left" ? -intensity : intensity;
+
+    // perspective layer
+    rotateLayer.style.transform = `rotateY(${rotateY}deg)`;
+
+    textEl.innerHTML = "";
+    textEl.style.animation = "none";
+
+    if (animation === "slideType") {
+        text.split("").forEach((char, i) => {
+            const span = document.createElement("span");
+            span.innerText = char;
+            span.style.animationDelay = `${i * 0.05}s`;
+            span.style.animationDuration = `${0.4 * speed}s`;
+            textEl.appendChild(span);
+        });
+    } else {
+        textEl.innerText = text;
+
+        if (animation !== "none") {
+            textEl.style.animation = `${animation} ${speed}s ease forwards`;
+        }
+    }
+}
+
+document.querySelectorAll("input, select").forEach(el => {
+    el.addEventListener("input", update);
+});
+
+update();
+</script>
+
+</body>
+</html>
